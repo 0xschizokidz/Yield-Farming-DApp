@@ -105,7 +105,7 @@ const WithdrawPage = () => {
             2. Enter the amount you wish to withdraw in the withdrawal section below.
           </Text>
           <Text mb="4" color="gray.400">
-            3. Click "Withdraw" to complete the withdrawal process.
+            3. Click &quot;Withdraw&quot; to complete the withdrawal process.
           </Text>
           <Text mb="4" color="gray.400">
             4. After withdrawing, you can view the updated available tokens displayed below.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Heading, Text, Button, useToast } from '@chakra-ui/react';
 import { claimRewards, calculateReward } from '../utils/stakingPoolContract'; // Adjust path if necessary
 
@@ -11,35 +11,8 @@ const ClaimRewardCard: React.FC<ClaimRewardCardProps> = ({ userAddress }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const toast = useToast();
 
-  useEffect(() => {
-    fetchReward();
-  }, [userAddress]);
-
-  const handleClaimRewards = async () => {
-    setLoading(true);
-    try {
-      await claimRewards();
-      toast({
-        title: "Rewards Claimed",
-        description: "Your rewards have been successfully claimed.",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      fetchReward();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Claiming rewards failed. Please try again.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-    setLoading(false);
-  };
-
-  const fetchReward = async () => {
+  // Define fetchReward using useCallback to prevent re-creation on every render
+  const fetchReward = useCallback(async () => {
     try {
       if (userAddress) {
         const reward = await calculateReward(userAddress);
@@ -53,6 +26,34 @@ const ClaimRewardCard: React.FC<ClaimRewardCardProps> = ({ userAddress }) => {
     } catch (error) {
       console.error('Error fetching rewards:', error);
     }
+  }, [userAddress]); // `userAddress` as dependency
+
+  useEffect(() => {
+    fetchReward();
+  }, [fetchReward]); // Add fetchReward as a dependency
+
+  const handleClaimRewards = async () => {
+    setLoading(true);
+    try {
+      await claimRewards();
+      toast({
+        title: "Rewards Claimed",
+        description: "Your rewards have been successfully claimed.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      fetchReward(); // Refresh reward amount after claiming
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Claiming rewards failed. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    setLoading(false);
   };
 
   return (

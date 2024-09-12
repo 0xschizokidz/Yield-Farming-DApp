@@ -1,32 +1,36 @@
 // Header.tsx
 
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Button, useColorMode, useToast } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import { ethers } from 'ethers';
 
-const Header = ({ title = "Yield Sphere" }: { title?: string }) => { // Default title is "Yield Sphere"
+const Header = ({ title = "Yield Sphere" }: { title?: string }) => {
   const { colorMode, toggleColorMode } = useColorMode();
   const [account, setAccount] = useState<string | null>(null);
   const toast = useToast();
 
+  useEffect(() => {
+    // Only run on the client side
+    const storedAddress = localStorage.getItem('walletAddress');
+    if (storedAddress) {
+      setAccount(storedAddress);
+    }
+  }, []);
+
   const connectWallet = async () => {
     try {
       if (window.ethereum) {
-        // Create a new provider instance
         const provider = new ethers.BrowserProvider(window.ethereum as any);
-        // Request accounts from MetaMask
         await provider.send('eth_requestAccounts', []);
-        // Get the signer
         const signer = await provider.getSigner();
-        console.log("Account:", await signer.getAddress());
-        // Get the connected address
         const address = await signer.getAddress();
-        // Update state with the connected address
+        
+        localStorage.setItem('walletAddress', address);
         setAccount(address);
-        // Show a success toast
+        
         toast({
           title: "Wallet connected",
           description: `Connected to ${address}`,

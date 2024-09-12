@@ -1,18 +1,8 @@
 // src/components/WalletConnect.tsx
 import React, { useState } from 'react';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { Web3Provider } from '@ethersproject/providers';
-
-// Define your connectors
-const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42], // Replace with your supported chain IDs
-});
-
-const walletConnect = new WalletConnectConnector({
-    qrcode: true,
-    supportedChainIds: [1, 3, 4, 5, 42], // Replace with your supported chain IDs
-});
+import { injected, walletConnect } from '../utils/connector';
 
 const WalletConnect: React.FC = () => {
     const [account, setAccount] = useState<string | null>(null);
@@ -33,10 +23,11 @@ const WalletConnect: React.FC = () => {
 
     const connectWalletConnect = async () => {
         try {
-            const walletConnectProvider = await walletConnect.getProvider();
-            const accounts = await walletConnectProvider.request({ method: 'eth_requestAccounts' });
+            // Initialize the WalletConnect provider
+            await walletConnect.enable(); // Enable WalletConnect session
+            const accounts = walletConnect.accounts; // Get accounts from WalletConnect provider
             setAccount(accounts[0]);
-            setProvider(new Web3Provider(walletConnectProvider));
+            setProvider(new Web3Provider(walletConnect));
             setConnected(true);
         } catch (error) {
             console.error("Failed to connect with WalletConnect", error);
@@ -45,7 +36,9 @@ const WalletConnect: React.FC = () => {
 
     const disconnect = () => {
         try {
-            // Clear connection state
+            if (walletConnect) {
+                walletConnect.disconnect(); // Disconnect WalletConnect session
+            }
             setAccount(null);
             setProvider(null);
             setConnected(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Flex, Box, Heading, Text, Divider, useToast } from '@chakra-ui/react';
 import Header from '../components/Header'; // Adjust path if necessary
 import StakingCard from '../components/StakingCard'; // Adjust path if necessary
@@ -14,8 +14,8 @@ const StakePage = () => {
   const [stakedAmount, setStakedAmount] = useState<string>('0');
   const toast = useToast();
 
-  // Fetch user's address
-  const connectWallet = async () => {
+  // Memoize connectWallet function with useCallback
+  const connectWallet = useCallback(async () => {
     try {
       if (window.ethereum) {
         const provider = new ethers.BrowserProvider(window.ethereum);
@@ -42,11 +42,11 @@ const StakePage = () => {
         isClosable: true,
       });
     }
-  };
+  }, [toast]); // Add toast as a dependency
 
   useEffect(() => {
     connectWallet();
-  }, []);
+  }, [connectWallet]); // Add connectWallet as a dependency
 
   useEffect(() => {
     const fetchStakedAmount = async () => {
@@ -68,7 +68,7 @@ const StakePage = () => {
     };
 
     fetchStakedAmount();
-  }, [userAddress]);
+  }, [userAddress, toast]); // Add userAddress and toast as dependencies
 
   return (
     <Flex direction="column" minHeight="100vh" bg="gray.900">
@@ -88,7 +88,7 @@ const StakePage = () => {
             2. Enter the amount you wish to stake in the staking section.
           </Text>
           <Text mb="4" color="gray.400">
-            3. Click "Stake" to complete the staking process.
+            3. Click &quot;Stake&quot; to complete the staking process.
           </Text>
           <Text mb="4" color="gray.400">
             4. After staking, you can view the total staked amount displayed below.
@@ -100,8 +100,6 @@ const StakePage = () => {
             </>
           )}
           <StakingCard />
-          <Text mb="4" color="gray.400">
-          </Text>
           <Divider mb="6" />
           {userAddress && (
             <>

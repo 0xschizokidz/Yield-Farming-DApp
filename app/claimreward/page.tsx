@@ -62,7 +62,7 @@ const ClaimRewardsPage = () => {
             2. Check the available rewards in the claim section below.
           </Text>
           <Text mb="4" color="gray.400">
-            3. Click "Claim Rewards" to complete the claiming process.
+            3. Click &quot;Claim Rewards&quot; to complete the claiming process.
           </Text>
           <Text mb="4" color="gray.400">
             4. Your rewards will be transferred to your wallet upon successful claim.
